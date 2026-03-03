@@ -17,7 +17,7 @@ const loginUser = async (req, res) => {
         const user = await userModel.findOne({ email });
 
         if (!user) {
-            return res.json({ success: false, message: "User doesn't exists" })
+            return res.status(401).json({ success: false, message: "User doesn't exists" })
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
@@ -25,11 +25,11 @@ const loginUser = async (req, res) => {
         if (isMatch) {
 
             const token = createToken(user._id)
-            res.json({ success: true, token })
+            res.status(200).json({ success: true, token })
 
         }
         else {
-            res.json({ success: false, message: 'Invalid credentials' })
+            res.status(401).json({ success: false, message: 'Invalid credentials' })
         }
 
     } catch (error) {
@@ -47,7 +47,7 @@ const registerUser = async (req, res) => {
         // checking user already exists or not
         const exists = await userModel.findOne({ email });
         if (exists) {
-            return res.json({ success: false, message: "User already exists" })
+            return res.status(409).json({ success: false, message: "User already exists" })
         }
 
         // validating email format & strong password
@@ -72,7 +72,7 @@ const registerUser = async (req, res) => {
 
         const token = createToken(user._id)
 
-        res.json({ success: true, token })
+        res.status(200).json({ success: true, token })
 
     } catch (error) {
         console.log(error);
@@ -88,9 +88,9 @@ const adminLogin = async (req, res) => {
 
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign(email+password,process.env.JWT_SECRET);
-            res.json({success:true,token})
+            res.status(200).json({success:true,token})
         } else {
-            res.json({success:false,message:"Invalid credentials"})
+            res.status(401).json({success:false,message:"Invalid Credentials"})
         }
 
     } catch (error) {
